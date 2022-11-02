@@ -1,4 +1,4 @@
-name: terraform-module-validate
+name: terraform-validate
 description: |
   Pipeline for Terraform Modules to validate the module. This action is usually
   run on Pull Request creation and updates.
