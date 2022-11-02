@@ -100,7 +100,7 @@ runs:
       continue-on-error: true
       uses: aquasecurity/tfsec-sarif-action@v0.1.3
       with:
-        working-directory: ${{  inputs.working-directory }}
+        working_directory: ${{  inputs.working-directory }}
         sarif_file: tfsec.sarif
 
     - name: post-tfsec-comments
