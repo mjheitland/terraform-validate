@@ -117,72 +117,72 @@ runs:
         sarif_file: terraform/tfsec.sarif
         category: tfsec
 
-    - name: change-directory
-      shell: bash
-      run: cd "${{ inputs.working-directory }}"
+    # - name: change-directory
+    #   shell: bash
+    #   run: cd "${{ inputs.working-directory }}"
 
-    - name: go-get
-      shell: bash
-      run: |
-          go version
-          go get ./...
-          go mod tidy
+    # - name: go-get
+    #   shell: bash
+    #   run: |
+    #       go version
+    #       go get ./...
+    #       go mod tidy
 
-    - name: assume-apply-role
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        role-to-assume: arn:aws:iam::804313491716:role/ops/blueprints-apply
-        aws-region: us-east-1
+    # - name: assume-apply-role
+    #   uses: aws-actions/configure-aws-credentials@v1
+    #   with:
+    #     role-to-assume: arn:aws:iam::804313491716:role/ops/blueprints-apply
+    #     aws-region: us-east-1
 
-    - name: setup
-      shell: bash
-      run: |
-          terraform -chdir=test/setup init -upgrade
-          terraform -chdir=test/setup apply -auto-approve -input=false || true
+    # - name: setup
+    #   shell: bash
+    #   run: |
+    #       terraform -chdir=test/setup init -upgrade
+    #       terraform -chdir=test/setup apply -auto-approve -input=false || true
 
-    - name: test
-      id: terratest
-      continue-on-error: true
-      shell: bash
-      run: |
-          go test -v ./test/integration
+    # - name: test
+    #   id: terratest
+    #   continue-on-error: true
+    #   shell: bash
+    #   run: |
+    #       go test -v ./test/integration
 
-    - name: teardown
-      shell: bash
-      run: terraform -chdir=test/setup apply -destroy -auto-approve -input=false
+    # - name: teardown
+    #   shell: bash
+    #   run: terraform -chdir=test/setup apply -destroy -auto-approve -input=false
 
-    - name: cleanup
-      shell: bash
-      run: git checkout . && git status
+    # - name: cleanup
+    #   shell: bash
+    #   run: git checkout . && git status
 
-    - name: checkout
-      uses: actions/checkout@v3
-      with:
-        persist-credentials: true
-        ref: ${{ github.event.pull_request.head.sha }}
+    # - name: checkout
+    #   uses: actions/checkout@v3
+    #   with:
+    #     persist-credentials: true
+    #     ref: ${{ github.event.pull_request.head.sha }}
 
-    - name: terraform-docs
-      id: terraform-docs
-      continue-on-error: true
-      uses: terraform-docs/gh-actions@v1
-      with:
-        config-file: .terraform-docs.yaml
-        output-format: markdown document
-        recursive: true
+    # - name: terraform-docs
+    #   id: terraform-docs
+    #   continue-on-error: true
+    #   uses: terraform-docs/gh-actions@v1
+    #   with:
+    #     config-file: .terraform-docs.yaml
+    #     output-format: markdown document
+    #     recursive: true
 
-        git-push: true
-        git-push-user-email: terraform-docs-bot@spglobal.com
-        git-push-user-name: terraform-docs[bot]
-        git-push-sign-off: true
-        git-commit-message: "chore: add terraform docs"
+    #     git-push: true
+    #     git-push-user-email: terraform-docs-bot@spglobal.com
+    #     git-push-user-name: terraform-docs[bot]
+    #     git-push-sign-off: true
+    #     git-commit-message: "chore: add terraform docs"
 
-    - name: exit-on-error
-      shell: bash
-      if: |
-        steps.fmt.outcome == 'failure' ||
-        steps.validate.outcome == 'failure' ||
-        steps.tflint.outcome == 'failure' ||
-        steps.tfsec.outcome == 'failure' ||
-        steps.terratest.outcome == 'failure' ||
-        steps.terraform-docs.outcome == 'failure'
-      run: exit 1
+    # - name: exit-on-error
+    #   shell: bash
+    #   if: |
+    #     steps.fmt.outcome == 'failure' ||
+    #     steps.validate.outcome == 'failure' ||
+    #     steps.tflint.outcome == 'failure' ||
+    #     steps.tfsec.outcome == 'failure' ||
+    #     steps.terratest.outcome == 'failure' ||
+    #     steps.terraform-docs.outcome == 'failure'
+    #   run: exit 1
