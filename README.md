@@ -1,6 +1,6 @@
 # terraform-validate
 
-Runs the following steps to validate the Terraform module:
+A GitHub Actions reusable workflow that runs the following steps to validate the Terraform module:
 
 - terraform fmt
 - terraform init
