@@ -1,4 +1,4 @@
-name: terraform-validate
+name: terraform-module-validate
 description: |
   Pipeline for Terraform Modules to validate the module. This action is usually
   run on Pull Request creation and updates.
@@ -11,10 +11,6 @@ inputs:
   go-version:
     description: Go version used for running the terratest tests.
     default: "1.18"
-    required: false
-  environment:
-    description: Environment to deploy to. (default = dev)
-    default: dev
     required: false
 
 runs:
@@ -98,10 +94,9 @@ runs:
     - name: tfsec
       id: tfsec
       continue-on-error: true
-      # uses: aquasecurity/tfsec-sarif-action@v0.1.3
-      uses: mjheitland/tfsec-sarif-action@v0.1.4
+      uses: aquasecurity/tfsec-sarif-action@v0.1.4
       with:
-        working_directory: ${{  inputs.working-directory }}
+        working_directory: ${{ inputs.working-directory }}
         sarif_file: tfsec.sarif
 
     - name: post-tfsec-comments
@@ -109,81 +104,20 @@ runs:
       if: github.event.name == 'pull_request'
       with:
         github_token: ${{ github.token }}
-        working-directory: terraform
+        working_directory: terraform
 
-    - name: post-tfsec-results
-      continue-on-error: true
-      uses: github/codeql-action/upload-sarif@v2
-      with:
-        sarif_file: terraform/tfsec.sarif
-        category: tfsec
-
-    # - name: change-directory
-    #   shell: bash
-    #   run: cd "${{ inputs.working-directory }}"
-
-    # - name: go-get
-    #   shell: bash
-    #   run: |
-    #       go version
-    #       go get ./...
-    #       go mod tidy
-
-    # - name: assume-apply-role
-    #   uses: aws-actions/configure-aws-credentials@v1
-    #   with:
-    #     role-to-assume: arn:aws:iam::804313491716:role/ops/blueprints-apply
-    #     aws-region: us-east-1
-
-    # - name: setup
-    #   shell: bash
-    #   run: |
-    #       terraform -chdir=test/setup init -upgrade
-    #       terraform -chdir=test/setup apply -auto-approve -input=false || true
-
-    # - name: test
-    #   id: terratest
+    # - name: post-tfsec-results
     #   continue-on-error: true
-    #   shell: bash
-    #   run: |
-    #       go test -v ./test/integration
-
-    # - name: teardown
-    #   shell: bash
-    #   run: terraform -chdir=test/setup apply -destroy -auto-approve -input=false
-
-    # - name: cleanup
-    #   shell: bash
-    #   run: git checkout . && git status
-
-    # - name: checkout
-    #   uses: actions/checkout@v3
+    #   uses: github/codeql-action/upload-sarif@v2
     #   with:
-    #     persist-credentials: true
-    #     ref: ${{ github.event.pull_request.head.sha }}
+    #     sarif_file: terraform/tfsec.sarif
+    #     category: tfsec
 
-    # - name: terraform-docs
-    #   id: terraform-docs
-    #   continue-on-error: true
-    #   uses: terraform-docs/gh-actions@v1
-    #   with:
-    #     config-file: .terraform-docs.yaml
-    #     output-format: markdown document
-    #     recursive: true
-
-    #     git-push: true
-    #     git-push-user-email: terraform-docs-bot@spglobal.com
-    #     git-push-user-name: terraform-docs[bot]
-    #     git-push-sign-off: true
-    #     git-commit-message: "chore: add terraform docs"
-
-    # - name: exit-on-error
-    #   shell: bash
-    #   if: |
-    #     steps.fmt.outcome == 'failure' ||
-    #     steps.validate.outcome == 'failure' ||
-    #     steps.tflint.outcome == 'failure' ||
-    #     steps.tfsec.outcome == 'failure' ||
-    #     steps.terratest.outcome == 'failure' ||
-    #     steps.terraform-docs.outcome == 'failure'
-    #   run: exit 1
+    - name: exit-on-error
+      shell: bash
+      if: |
+        steps.fmt.outcome == 'failure' ||
+        steps.validate.outcome == 'failure' ||
+        steps.tflint.outcome == 'failure' ||
+        steps.tfsec.outcome == 'failure'
+      run: exit 1
